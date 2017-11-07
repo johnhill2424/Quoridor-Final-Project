@@ -78,8 +78,8 @@ public class GridBag extends JFrame implements ActionListener{
             //right wall creation
             button = new JButton(""); 
             button.setBackground(Color.BLUE);
-            c.ipadx = 0;
-            c.ipady = (int)((w/h)*80.0);
+            c.ipadx = (int)((w/h)*20);
+            c.ipady = (int)((w/h)*80);
             c.gridx = 1;
             c.gridy = 0;
             gridbag.setConstraints(button, c);
@@ -103,8 +103,8 @@ public class GridBag extends JFrame implements ActionListener{
             button.setBackground(Color.BLUE);
             c.gridx = 0;
             c.gridy = 1;
-            c.ipadx = (int)((w/h)*95.5);
-            c.ipady = (int)((w/h)*20.5);
+            c.ipadx = (int)((w/h)*100.5);
+            c.ipady = (int)((w/h)*50.5);
             gridbag.setConstraints(button, c);            
             bottomWall[i][j] = button;
             bottomWall[i][j].setActionCommand("bottom" + "-" + i + "-" + j);
@@ -127,8 +127,8 @@ public class GridBag extends JFrame implements ActionListener{
             button.setBackground(Color.BLUE);
             c.gridx = 1;
             c.gridy = 1;
-            c.ipadx = 0;
-            c.ipady = (int)((w/h)*20.5);
+            c.ipadx = (int)((w/h)*20);
+            c.ipady = (int)((w/h)*60);
             gridbag.setConstraints(button, c);
             centerWall[i][j] = button;
             centerWall[i][j].setActionCommand("center" + "-" + i + "-" + j);
@@ -157,7 +157,7 @@ public class GridBag extends JFrame implements ActionListener{
       //Windows and visibility 
       setTitle("Quoridor Mini Project");
       setSize( w/2 , h/2 );
-      pack();
+      //pack();
       setLocationRelativeTo(this);
       setDefaultCloseOperation( EXIT_ON_CLOSE );
       setVisible(true); 
