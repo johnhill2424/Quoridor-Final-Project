@@ -42,6 +42,8 @@ public class GridBag extends JFrame implements ActionListener{
       
       int h = screenSize.height;
       int w = screenSize.width;
+      System.out.println(h);
+      System.out.println(w);
       
       JPanel jpBoard;
       jpBoard = new JPanel(new GridLayout(9,9));
@@ -65,8 +67,8 @@ public class GridBag extends JFrame implements ActionListener{
             //player space   
             button = new JButton("            ");
             button.setFocusPainted(false);
-            c.ipadx = (int)((w/h)*80); //x spacing
-            c.ipady = (int)((w/h)*80); //y spacing
+            c.ipadx = (int)(w/40); //x spacing
+            c.ipady = (int)(w/40); //y spacing
             c.gridx = 0; //0 x location
             c.gridy = 0; //0 y location
             gridbag.setConstraints(button, c);
@@ -78,8 +80,8 @@ public class GridBag extends JFrame implements ActionListener{
             //right wall creation
             button = new JButton(""); 
             button.setBackground(Color.BLUE);
-            c.ipadx = (int)((w/h)*20);
-            c.ipady = (int)((w/h)*80);
+            c.ipadx = (int)(w/400);
+            c.ipady = (int)(w/35);
             c.gridx = 1;
             c.gridy = 0;
             gridbag.setConstraints(button, c);
@@ -103,8 +105,8 @@ public class GridBag extends JFrame implements ActionListener{
             button.setBackground(Color.BLUE);
             c.gridx = 0;
             c.gridy = 1;
-            c.ipadx = (int)((w/h)*100.5);
-            c.ipady = (int)((w/h)*50.5);
+            c.ipadx = (int)(w/35);
+            c.ipady = (int)(w/400);
             gridbag.setConstraints(button, c);            
             bottomWall[i][j] = button;
             bottomWall[i][j].setActionCommand("bottom" + "-" + i + "-" + j);
@@ -127,8 +129,8 @@ public class GridBag extends JFrame implements ActionListener{
             button.setBackground(Color.BLUE);
             c.gridx = 1;
             c.gridy = 1;
-            c.ipadx = (int)((w/h)*20);
-            c.ipady = (int)((w/h)*60);
+            c.ipadx = (int)(w/400);
+            c.ipady = (int)(w/400);
             gridbag.setConstraints(button, c);
             centerWall[i][j] = button;
             centerWall[i][j].setActionCommand("center" + "-" + i + "-" + j);
@@ -157,7 +159,7 @@ public class GridBag extends JFrame implements ActionListener{
       //Windows and visibility 
       setTitle("Quoridor Mini Project");
       setSize( w/2 , h/2 );
-      //pack();
+      pack();
       setLocationRelativeTo(this);
       setDefaultCloseOperation( EXIT_ON_CLOSE );
       setVisible(true); 
