@@ -67,8 +67,8 @@ public class GridBag extends JFrame implements ActionListener{
             //player space   
             button = new JButton("            ");
             button.setFocusPainted(false);
-            c.ipadx = (int)(w/40); //x spacing
-            c.ipady = (int)(w/40); //y spacing
+            c.ipadx = (int)(20); //x spacing
+            c.ipady = (int)(20); //y spacing
             c.gridx = 0; //0 x location
             c.gridy = 0; //0 y location
             gridbag.setConstraints(button, c);
@@ -80,8 +80,8 @@ public class GridBag extends JFrame implements ActionListener{
             //right wall creation
             button = new JButton(""); 
             button.setBackground(Color.BLUE);
-            c.ipadx = (int)(w/400);
-            c.ipady = (int)(w/35);
+            c.ipadx = (int)(10);
+            c.ipady = (int)(30);
             c.gridx = 1;
             c.gridy = 0;
             gridbag.setConstraints(button, c);
@@ -105,8 +105,8 @@ public class GridBag extends JFrame implements ActionListener{
             button.setBackground(Color.BLUE);
             c.gridx = 0;
             c.gridy = 1;
-            c.ipadx = (int)(w/35);
-            c.ipady = (int)(w/400);
+            c.ipadx = (int)(w/30);
+            c.ipady = (int)(10);
             gridbag.setConstraints(button, c);            
             bottomWall[i][j] = button;
             bottomWall[i][j].setActionCommand("bottom" + "-" + i + "-" + j);
@@ -129,8 +129,8 @@ public class GridBag extends JFrame implements ActionListener{
             button.setBackground(Color.BLUE);
             c.gridx = 1;
             c.gridy = 1;
-            c.ipadx = (int)(w/400);
-            c.ipady = (int)(w/400);
+            c.ipadx = (int)(10);
+            c.ipady = (int)(10);
             gridbag.setConstraints(button, c);
             centerWall[i][j] = button;
             centerWall[i][j].setActionCommand("center" + "-" + i + "-" + j);
@@ -158,10 +158,11 @@ public class GridBag extends JFrame implements ActionListener{
             
       //Windows and visibility 
       setTitle("Quoridor Mini Project");
-      setSize( w/2 , h/2 );
+      setSize( w/4 , h/4 );
       pack();
       setLocationRelativeTo(this);
       setDefaultCloseOperation( EXIT_ON_CLOSE );
+      setResizable(false);
       setVisible(true); 
    
    
