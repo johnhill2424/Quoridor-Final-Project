@@ -1,0 +1,71 @@
+****CLIENT****
+//This file is pseudo code for HW7Client.java
+
+class Client extends JFrame{
+	Attributes:
+	JTextArea
+	JTextField
+	JButton
+	
+	String message //This holds the message that will be sent to the textArea
+
+
+	Main(){
+
+		Create socket (use port 16789);
+
+		Create input stream for recieveing info from server.
+			
+		Create outpout stream for sending info to server.
+		
+		create InputStreamChecker thread object.
+
+		run GUI;
+		
+			
+	}
+	Constructor(){
+	
+		Create jpanel with text area, text field and "send" button.
+		
+		add button to action listener.
+		
+		
+		
+	}
+	
+	inner class button implements actionListener{
+	
+		method action listener {
+			
+			//This button is the "Send" button.
+			
+			Takes in the text from the textfield and appends it
+			to the textArea.
+			
+			also takes textfield's text and put into output stream to
+			server.
+		
+		}
+	
+	}
+	inner class InputStreamChecker extends Threads {
+	
+		constructor
+		
+		method run{
+		
+			while(true){
+			
+				Text Area.append(Input stream.read line)
+			
+				
+			
+			}
+		
+		}
+	
+	}
+	
+	
+}

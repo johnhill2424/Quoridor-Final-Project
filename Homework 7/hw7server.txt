@@ -1,0 +1,67 @@
+****SERVER****
+//This file is pseudo code for HW7Server.java
+
+
+class Server {
+	Attributes:
+	
+	Vector ClientStreams //keeps track of all of the connect client's outputstreams
+
+	
+
+	Main{
+		runs Server();
+	}
+	Constructor{
+	
+		Creates server socket
+		
+		Client Socket = null;
+		
+		while(true){
+			
+			client socket = server socket.accept
+			
+			Create thread object;
+			start thread object;
+		
+			
+		}
+	
+	}
+	method messageChecker(String message){
+	
+		for( the length of Vector ClientStream){
+		
+			ClientStream.get(i).printWriter(message);
+		}
+	
+	}
+	class threadServer extends Thread{
+		Attribute:
+		
+		Socket = null;
+		
+		Constructor(client socket){
+			socket = client socket;
+		}
+		method run{
+		
+			Create output stream.
+			
+			add output stream to ClientStream Vector.
+			
+			Create input stream.
+			
+			
+			run method messageChecker(input stream);
+			
+		
+		}
+		
+	
+	
+	}
+	
+
+}
