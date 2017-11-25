@@ -148,7 +148,9 @@ public class Player extends JFrame{
                message = jtfMessage.getText(); //get text from text field
                ChatMessage cm = new ChatMessage(message);
                try{
-                  oos.writeObject(cm); //send to server
+                  oos.writeObject(cm); //send to serverJPanel jpPlayers = new JPanel(new GridLayout(0,1));JPanel jpPlayers = new JPanel(new GridLayout(0,1));
+
+
                   oos.flush();
                }
                catch (IOException io){}
@@ -522,7 +524,7 @@ public class Player extends JFrame{
                }//End of if
                else if (genObject instanceof ChatMessage){
                   ChatMessage cm = (ChatMessage)genObject;
-                  jtaMessage.append(cm.getMessage()+"\n");  
+                  jtaMessage.append(cm.toString());  
                }
             }//End of while 
          

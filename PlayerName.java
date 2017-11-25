@@ -12,5 +12,8 @@ public class PlayerName implements Serializable {
    public String getPlayerName(){
       return name;
    }
+	public void setPlayerName(String name_){
+		name = name_;
+	}
 
 } //End of class playerInfo 
