@@ -19,16 +19,22 @@ public class Player extends JFrame{
    ObjectInputStream ois;
 
 
-   int[][] playerSpace = new int[9][9];
+   int[][] playerArray = new int[9][9];
                                     
-   int[][] rightWall = new int[9][9];
+   int[][] rightArray = new int[9][9];
 
-   int[][] bottomWall = new int[9][9];
+   int[][] bottomArray = new int[9][9];
 
-   int[][] centerWall = new int[9][9];
+   int[][] centerArray = new int[9][9];
    
    //Pathing solution
-   int[][] solution = new int[10][10];
+   int[][] solution = new int[9][9];
+   
+   JButton[][] centerWall;
+   JButton[][] playerSpace;
+   JButton[][] rightWall;
+   JButton[][] bottomWall;
+   JButton button;
    
    //column then row 
    int[][] tLocation = new int[][]{
@@ -49,6 +55,8 @@ public class Player extends JFrame{
                                                    
    int pAmount = 4; //# of players  
    
+   //Store name?
+   String playerName = "Player";
    
    //CHAT VAR
    private JTextArea jtaMessage; 
@@ -148,7 +156,9 @@ public class Player extends JFrame{
                message = jtfMessage.getText(); //get text from text field
                ChatMessage cm = new ChatMessage(message);
                try{
-                  oos.writeObject(cm); //send to server
+                  oos.writeObject(cm); //send to serverJPanel jpPlayers = new JPanel(new GridLayout(0,1));JPanel jpPlayers = new JPanel(new GridLayout(0,1));
+
+
                   oos.flush();
                }
                catch (IOException io){}
@@ -271,12 +281,6 @@ public class Player extends JFrame{
       }
    }  
    class GridBag extends JPanel implements ActionListener{
-   
-      JButton[][] centerWall;
-      JButton[][] playerSpace;
-      JButton[][] rightWall;
-      JButton[][] bottomWall;
-      JButton button;
       
       GridBag(){
    
@@ -430,20 +434,61 @@ public class Player extends JFrame{
                                
             //Horizontal wall was clicked 
             if (choice == JOptionPane.YES_OPTION){
-               //System.out.println("Horizontal Wall");
-               centerWall[x][y].setBackground(Color.RED);
+               //Temp horz wall in Array to check if path avaliable
+               centerArray[x][y] = 1;            
+               bottomArray[x][y]= 1;
+               bottomArray[x][y+1] = 1;
+               if(pathTrial() == true){
+               //path found
+                  centerArray[x][y] = 0;
+                  bottomArray[x][y] = 0;
+                  bottomArray[x][y+1] = 0;
+                  //sets the arrays back ... they will be changed during the reading phase
+                  HorzPlace hp = new HorzPlace(x,y, playerName);
+                  try{
+                     oos.writeObject(hp); //send to server
+                     oos.flush();
+                  }
+                  catch (IOException io){}
                
-               bottomWall[x][y].setBackground(Color.RED);
-               bottomWall[x][y+1].setBackground(Color.RED);
-               
+                  //NEEDS TO DISABLE CLICKING / TURN ADDTO      
+                  }
+               else{
+                  //GIVE PROMPT TELL THEM OPTION IS NOT ALLOWED/ THIS BLOCKS PATH
+                  centerArray[x][y] = 0;
+                  bottomArray[x][y] = 0;
+                  bottomArray[x][y+1] = 0;
+                  JOptionPane.showMessageDialog(centerWall[x][y], "This is not a valid move. Placing this wall will block other player's paths. Please choose again.");
+               }             
             }
             //Vertical wall was clicked
             else if(choice == JOptionPane.NO_OPTION){
-               //System.out.println("Vertical Wall");
-               centerWall[x][y].setBackground(Color.RED);
+               //Temp horz wall in Array to check if path avaliable
+               centerArray[x][y] = 1;            
+               rightArray[x][y]= 1;
+               rightArray[x][y+1] = 1;
+               if(pathTrial() == true){
+               //path found
+                  centerArray[x][y] = 0;
+                  rightArray[x][y] = 0;
+                  rightArray[x][y+1] = 0;
+                  //sets the arrays back ... they will be changed during the reading phase
+                  VertPlace vp = new VertPlace(x,y,playerName);
+                  try{
+                     oos.writeObject(vp); //send to server
+                     oos.flush();
+                  }
+                  catch (IOException io){}
                
-               rightWall[x][y].setBackground(Color.RED);
-               rightWall[x+1][y].setBackground(Color.RED);
+                  //NEEDS TO DISABLE CLICKING / TURN  ADDTO        
+                  }
+               else{
+                  //GIVE PROMPT TELL THEM OPTION IS NOT ALLOWED/ THIS BLOCKS PATH
+                  centerArray[x][y] = 0;
+                  rightArray[x][y] = 0;
+                  rightArray[x][y+1] = 0;
+                  JOptionPane.showMessageDialog(centerWall[x][y], "This is not a valid move. Placing this wall will block other player's paths. Please choose again.");
+               }
             }
              
          } //End of center if
@@ -477,10 +522,8 @@ public class Player extends JFrame{
             ThreadReader tr = new ThreadReader(); 
             tr.start(); //starts the reader thread 
             
-            String playerName;
             playerName = JOptionPane.showInputDialog("Enter a player name: ");
             PlayerName player = new PlayerName(playerName);
-            
             oos.writeObject(player); //send player name to server
             oos.flush();
             
@@ -511,7 +554,7 @@ public class Player extends JFrame{
       public void run(){
       
          try{
-            PlayersInfo playersInfo;
+            PlayersInfo playersInfo = new PlayersInfo();
 
             
             Object genObject = null; 
@@ -519,10 +562,48 @@ public class Player extends JFrame{
                if (genObject instanceof PlayersInfo){
                   playersInfo = (PlayersInfo)genObject;
                   System.out.println(playersInfo.getName(0)); 
+                  
+                  //We should do something with this????
                }//End of if
                else if (genObject instanceof ChatMessage){
                   ChatMessage cm = (ChatMessage)genObject;
-                  jtaMessage.append(cm.getMessage()+"\n");  
+                  jtaMessage.append(cm.toString());  
+               }
+               else if (genObject instanceof HorzPlace){
+                  HorzPlace hp = (HorzPlace)genObject;
+                  int x = hp.getX();
+                  int y = hp.getY();
+                  String tempName = hp.getName();
+                  
+                  centerArray[x][y] = 1;
+                  bottomArray[x][y] = 1;
+                  bottomArray[x][y+1] = 1;
+                  
+                  centerWall[x][y].setBackground(Color.RED);
+                  bottomWall[x][y].setBackground(Color.RED);
+                  bottomWall[x][y+1].setBackground(Color.RED);
+                  
+                  int index = playersInfo.getIndex(tempName);
+                  wallCount.set(index, wallCount.get(index) -1);
+                  jlWallCount.get(index).setText(pNames.get(index) + "'s Walls: " + wallCount.get(index)); 
+               }
+               else if (genObject instanceof VertPlace){
+                  VertPlace vp = (VertPlace)genObject;
+                  int x = vp.getX();
+                  int y = vp.getY();
+                  String tempName = vp.getName();
+                  
+                  centerWall[x][y].setBackground(Color.RED);
+                  rightWall[x][y].setBackground(Color.RED);
+                  rightWall[x][y+1].setBackground(Color.RED);     
+                  
+                  centerArray[x][y] = 1;
+                  rightArray[x][y] = 1;
+                  rightArray[x][y +1] = 1;
+                  
+                  int index = playersInfo.getIndex(tempName);
+                  wallCount.set(index, wallCount.get(index) -1);
+                  jlWallCount.get(index).setText(pNames.get(index) + "'s Walls: " + wallCount.get(index));           
                }
             }//End of while 
          
@@ -545,8 +626,182 @@ public class Player extends JFrame{
       }
 
 
-} //End of inner class ThreadConnection
+   } //End of inner class ThreadConnection
+
+   boolean pathTrial(){
+      boolean pathAllow = true;
+      for(int pNum = 0; pNum < pAmount; pNum++){//change pAmount for less players or have a list of only active players (Option)
+         if(pathFound(pNum) == false){
+            clearArray(solution);
+            pathAllow = false;
+            break;
+         }
+         clearArray(solution);
+         if(pNum == pAmount -1){
+            pathAllow = true;
+         }
+      }
+      return pathAllow;
+   }//end PathTrail
    
+   /*public void printSolution(int solution[][], int bottomArray[][], int rightArray[][],int centerArray[][]){
+      for(int i = 0; i < 9; i++){
+         for(int j = 0; j < 9; j++){
+               System.out.print(" " + solution[i][j] + " " + rightArray[i][j]);
+         }//end of inner for loop
+         System.out.println();
+         for(int j = 0; j < 9; j++){
+               System.out.print(" " + bottomArray[i][j] + " " + centerArray[i][j]);
+         }//end of inner for loop         
+         System.out.println();
+      }//end of outer for loop
+     System.out.println("Exit printSolution");
+   }//end printSolution*/
+   
+   boolean pathFound(int playerNum){
+   
+      //passes in player token locations and player number
+      if (pathRec(tLocation[playerNum][0], tLocation[playerNum][1], playerNum) == false){
+      
+         System.out.println("No path found");
+         return false;
+      }
+      
+      System.out.println("Path found");     
+      return true;
+   }//end pathFound
+   
+   //returns false if the cordinates are outside of the array or player space is filled
+   boolean isSafe(int x, int y, int array[][]){
+      return( x >= 0 && x < 9 && y >= 0 && y < 9 && array[x][y] == 0); //replace 9 with a variable for Array lengths
+   }//end isSafe
+   
+   //reset the solution to empty
+   public void clearArray(int array[][]){
+      for(int i = 0; i < 9; i++){
+         for(int j = 0; j < 9; j++){
+            array[i][j] = 0;
+         }//end of inner loop
+      }//end of outer loop
+   }//end of Clear Solution
+      
+   boolean pathRec(int x, int y, int num){
+   
+      //Check for path avaliable allows exit of recursion
+      if((num == 0 || num == 1) && x == winCon[num]){
+         //System.out.println("in win codition "+ x + " "+ winCon[num]);
+         solution[x][y] = 1;
+         //printSolution(solution, bottomArray, rightArray, centerArray); //Prints array of solution path
+         return true; 
+      }//end of if , check for player 1 and 2 have a path
+      if((num == 2 || num == 3) && y == winCon[num]){
+         solution[x][y] = 1;
+         //printSolution(solution, bottomArray, rightArray, centerArray); //Prints array of solution path
+         return true;
+      }// end of if, check for player 3 and 4 have a path
+      
+      if(isSafe(x, y, solution) == true){ //runs if player space is safe
+         
+         //mark solution path taken
+         solution[x][y] = 1;
+         
+         //check for movement depending on player direction needed to win
+         if(num == 0){
+            //try south
+            if(isSafe(x,y,bottomArray) == true){ //check if wall in array and empty 
+               if(pathRec(x + 1, y, num)){
+                  return true;
+               }
+            }
+            //try east
+            if(isSafe(x,y,rightArray) == true){ //check if wall in array and empty
+               if(pathRec(x, y + 1, num)){
+                  return true;
+               }
+            }
+            //try west
+            if(isSafe(x,y-1,rightArray) == true){//check if wall in array and empty
+               if(pathRec(x, y - 1, num)){
+                  return true;
+               }
+            }
+            //backtrack
+            solution[x][y] = 0;
+            return false;          
+         }
+         if(num == 1){
+            //try north
+            if(isSafe(x - 1,y,bottomArray) == true){ //check if wall in array and empty 
+               if(pathRec(x - 1, y, num)){
+                  return true;
+               }
+            }
+            //try west
+            if(isSafe(x,y - 1,rightArray) == true){//check if wall in array and empty
+               if(pathRec(x, y - 1, num)){
+                  return true;
+               }
+            }
+            //try east
+            if(isSafe(x,y,rightArray) == true){ //check if wall in array and empty
+               if(pathRec(x, y + 1, num)){
+                  return true;
+               }
+            }
+            //backtrack
+            solution[x][y] = 0;
+            return false;  
+         }
+         if(num == 2){
+            //try east
+            if(isSafe(x,y,rightArray) == true){ //check if wall in array and empty
+               if(pathRec(x, y + 1, num)){
+                  return true;
+               }
+            }
+            //try south
+            if(isSafe(x,y,bottomArray) == true){ //check if wall in array and empty 
+               if(pathRec(x + 1, y, num)){
+                  return true;
+               }
+            }
+            //try north
+            if(isSafe(x - 1,y,bottomArray) == true){ //check if wall in array and empty 
+               if(pathRec(x - 1, y, num)){
+                  return true;
+               }
+            }
+            //backtrack
+            solution[x][y] = 0;
+            return false;    
+         }
+         if(num == 3){
+            //try west
+            if(isSafe(x,y - 1,rightArray) == true){//check if wall in array and empty
+               if(pathRec(x, y - 1, num)){
+                  return true;
+               }
+            }
+            //try north
+            if(isSafe(x - 1,y,bottomArray) == true){ //check if wall in array and empty 
+               if(pathRec(x - 1, y, num)){
+                  return true;
+               }
+            }
+            //try south
+            if(isSafe(x,y,bottomArray) == true){ //check if wall in array and empty 
+               if(pathRec(x + 1, y, num)){
+                  return true;
+               }
+            }
+            //backtrack
+            solution[x][y] = 0;
+            return false;    
+         }
+      }//is playerspace safe end 
+      
+      return false; //if player space is unsafe           
+   }//end of path Recursion     
    
    
    
