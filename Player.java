@@ -6,6 +6,7 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
+//NEWEST VERSION
 public class Player extends JFrame{
 
    // send output to server
@@ -73,6 +74,14 @@ public class Player extends JFrame{
    private JTextArea jtaMessage; 
    private JTextField jtfMessage; 
    
+  	//NEW STUFF FROM JACK
+	private JMenuBar jmb;
+	private JMenu jm;
+	private JMenuItem jmiAbout, jmiCredits, jmiExit, jmiConnect;
+
+	//Connect Window Info NEW STUFF FROM JACK
+	private String ip_address;
+   
    //Player Names when game is initially started
    ArrayList<String> pNames = new ArrayList<String>();
    
@@ -133,6 +142,9 @@ public class Player extends JFrame{
          jlScore.add(new JLabel());
          
       }
+	
+		add(new PlayerMenu(), BorderLayout.NORTH);
+
       add(new GridBag(), BorderLayout.CENTER);
       
       add(new ChatDisplay(), BorderLayout.EAST); 
@@ -145,10 +157,168 @@ public class Player extends JFrame{
       setDefaultCloseOperation( EXIT_ON_CLOSE );
       setVisible(true); 
       
-      new SocketSetup();
+      //new SocketSetup();
+      
+      //NEW STUFF FROM JACK
+      clientName = JOptionPane.showInputDialog("Enter a player name: ");
+      
+
+		addWindowListener(new WindowAdapter(){
+			@Override
+			public void windowClosing(WindowEvent e){
+
+				new PlayerDisconnect();
+			}
+
+		});
       
    }
 
+	//The JMenu Class
+	//PlayerMenu NEW STUFF BY JACK
+	class PlayerMenu extends JPanel {
+		
+		public PlayerMenu(){
+			
+			setLayout(new FlowLayout(FlowLayout.LEFT));
+			
+			
+			jmb = new JMenuBar();
+			add(jmb);
+
+			jm = new JMenu("Settings");
+			jmb.add(jm);
+
+			jmiConnect = new JMenuItem("Connect...");
+			jmiAbout = new JMenuItem("Game Rules");
+			jmiCredits = new JMenuItem("Credits");
+			jmiExit = new JMenuItem("Exit");
+
+			jm.add(jmiConnect);
+			jm.add(jmiAbout);
+			jm.add(jmiCredits);
+			jm.add(jmiExit);
+
+			jmiConnect.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent ae){
+					new ConnectWindow();
+
+				}
+
+			});
+			jmiAbout.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent ae){
+
+
+				}
+
+			});
+			jmiCredits.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent ae){
+
+
+				}
+
+			});
+			jmiExit.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent ae){
+					//System.exit(0);
+					new PlayerDisconnect();
+
+				}
+
+			});
+
+		}
+
+
+	}//end of PlayerMenu Class
+
+	//CONNECT WINDOW NEW STUFF BY JACK
+	class ConnectWindow extends JFrame{
+
+   	private JPanel jpStartPane;
+   	private JPanel jpNamePane;
+   	private JPanel jpIpPane;
+   
+   
+   	private JLabel jlAddress;
+   	private JTextField jtfAddress;
+   
+   	private JButton jbConnect;
+   
+   
+   	public ConnectWindow(){
+   
+      	//General Frame Information
+      	setTitle("Client Start-Up");
+      	setDefaultCloseOperation(ConnectWindow.DISPOSE_ON_CLOSE);
+      	setSize(400,150);
+      	setLocationRelativeTo(null);
+      
+      	//Create Panels
+      	jpStartPane = new JPanel();
+      	jpNamePane = new JPanel(new FlowLayout());
+      	jpIpPane = new JPanel(new FlowLayout());
+      
+      
+      	//create Label and field for ip Address
+      	jlAddress = new JLabel("Server IP: ");
+      	jpIpPane.add(jlAddress);
+      
+      	jtfAddress = new JTextField(20);
+      	jpIpPane.add(jtfAddress);
+      
+ 			//Add Panels to JFrame
+      	jpStartPane.add(jpNamePane, BorderLayout.NORTH);
+      	jpStartPane.add(jpIpPane, BorderLayout.CENTER);
+      
+      	jbConnect = new JButton("Start Client");
+      	jpStartPane.add(jbConnect, BorderLayout.SOUTH);
+      	add(jpStartPane);
+
+			jbConnect.addActionListener(new ActionListener(){
+				public void actionPerformed(ActionEvent ae){
+					ip_address = jtfAddress.getText();
+					new SocketSetup();
+					dispose();
+      			//new SocketSetup();
+
+				}
+
+			});
+
+			setVisible(true);
+		}
+
+	}
+
+	//INNER CLASS PlayerDisconnect NEW STUFF BY JACK
+	class PlayerDisconnect{
+
+		public PlayerDisconnect(){
+			
+			PlayerExit pe = new PlayerExit();
+
+			try{
+				oos.writeObject(pe);
+				oos.flush();
+
+			}
+			catch(IOException ioe){
+				System.out.println("window adapter exception");
+			}
+			catch(NullPointerException npe){
+				System.out.println("PlayerDisconnect NPE");
+			}
+			finally{
+				System.exit(0);
+			}
+	
+		}
+		
+
+  	}//end of PlayerDisconnect 
    
    class ChatDisplay extends JPanel implements ActionListener, KeyListener{
    
@@ -555,7 +725,7 @@ public class Player extends JFrame{
       public SocketSetup(){
       
          try{
-            Socket s = new Socket("localhost", 16789);
+            Socket s = new Socket(ip_address, 16789);
                      
             // output to the server
             out = s.getOutputStream(); 
@@ -569,6 +739,12 @@ public class Player extends JFrame{
             tr.start(); //starts the reader thread 
             
          } //End of try
+         catch (UnknownHostException uhe){
+					System.out.println("WRONG IP BOI");
+					//JOptionPane.showMessageDialog(null, "No server with that IP.");
+
+
+			}
          
          catch (ConnectException ce){
             System.out.println("Sorry no server available at the time");
@@ -595,7 +771,7 @@ public class Player extends JFrame{
       public void run(){
       
          try{
-            clientName = JOptionPane.showInputDialog("Enter a player name: ");
+            //clientName = JOptionPane.showInputDialog("Enter a player name: ");
             PlayerName pn = new PlayerName(clientName);
             oos.writeObject(pn); //send player name to server
             oos.flush();
@@ -730,6 +906,25 @@ public class Player extends JFrame{
                   
                
                }
+               //NEW STUFF BY JACK
+					else if(genObject instanceof PlayerExit){
+						PlayerExit pl = (PlayerExit)genObject;
+						
+						try{
+							ois.close();
+							oos.close();
+						}
+						catch(IOException ioe){
+						}
+						finally{
+							System.exit(0);
+						}
+
+
+
+					}
+               
+               
             }//End of while 
          
           } //end of try

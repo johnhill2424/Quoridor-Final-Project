@@ -7,7 +7,7 @@ import java.io.*;
 import java.lang.Object.*;
 import java.lang.StringBuilder;
 
-
+//NEWEST VERSION
 public class Server extends JFrame{
 
 
@@ -116,8 +116,14 @@ public class Server extends JFrame{
    } //End of server constructor 
 
 	//jtaToString creates a string that will create the output for the server player JTAs
-	public String jtaToString(String name, String address){
-		String result = String.format("%s%n%s%n", name, address);
+	public String jtaConnectToString(String name, String address){
+		String result = String.format("%s%n%s%nConnected%n", name, address);
+
+		return result;
+
+	}
+	public String jtaDisconnectToString(String name, String address){
+		String result = String.format("%s%n%s%nDisconnected%n", name, address);
 
 		return result;
 
@@ -141,6 +147,7 @@ public class Server extends JFrame{
       //start the work of the thread 
       public void run(){
       	String name = "no name";
+			int index = 0;
 
          try{
  
@@ -164,9 +171,9 @@ public class Server extends JFrame{
                   
                   name = pn.getPlayerName();
                   nameList.add(name); //adds the player to the playerName arraylist
-                  int index = nameList.size() -1;
+                  index = nameList.size() -1;
                   connectionList.add("C");
-						jtaDisplay.get(index).setText(name + "\n" + cs);
+						jtaDisplay.get(index).setText(jtaConnectToString(name, (""+cs)));
                   pn.setIndex(index);
                   //Must reject additional players here ADDTO
                    
@@ -253,7 +260,42 @@ public class Server extends JFrame{
                      pt.sendInfo(place);
                   }
                   passTurn(place.getIndex(), 0, place.getIndex());   
-               }    
+               }
+               else if(genObject instanceof PlayerExit){
+						PlayerExit pl = (PlayerExit)genObject;
+
+						System.out.println("Player Exited BOIII");
+						
+						for(int i=0; i<connectionList.size(); i++){
+							System.out.println(connectionList.get(i));
+						}
+
+						connectionList.set(index, "D");
+
+						for(int i=0; i<connectionList.size(); i++){
+							System.out.println(connectionList.get(i));
+						}
+
+						jtaDisplay.get(index).setText(jtaDisconnectToString(name, (""+cs)));
+
+
+						try{
+							oos.writeObject(pl);
+							oos.flush();
+
+							oos.close();
+							ois.close();
+							cs.close();
+						}
+						catch(IOException ioe){
+							System.out.println("Confirmed Player left Boi");
+						}
+					
+						
+					}
+               
+               
+                   
             }//End of while 
              
                
@@ -270,6 +312,7 @@ public class Server extends JFrame{
          
          catch (SocketException se){
             System.out.println("A player has disconnected");
+            jtaChatLog.append("**A PLAYER HAS DISCONNECTED**");
          }
          
          catch(NullPointerException npe){
