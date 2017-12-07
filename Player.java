@@ -6,27 +6,9 @@ import java.io.*;
 import java.util.*;
 import java.net.*;
 
-/**
- * Player is a serialized class, and the main GUI for the Quoridor game, which contains the 
- * board, message area, score board, and their functionalities. <p>
- *
- * @author Catherine Poggioli 
- * @author John Hill
- * @author Jack Old
- * @author David Luong
- *
- * @group# 06 
- * @course ISTE 121
- * @instructor Michael Floeser
- *
- * @version 2017-11-30
- */
-
+//NEWEST VERSION
 public class Player extends JFrame{
-   /**
-    * @attributes: an output stream, and another one for passing in the player object
-    * @description: send output to server
-    */
+
    // send output to server
    OutputStream out;
    ObjectOutputStream oos;
@@ -34,10 +16,7 @@ public class Player extends JFrame{
    //ArrayList<Vector> playerNames = new ArrayList<Vector>();
    
    JButton jbSend;
-   /**
-    * @attributes: an input stream, and another one for passing in the player object
-    * @description: open input from the server
-    */   
+   
    // open input from the server
    InputStream in;
    ObjectInputStream ois;
@@ -125,12 +104,7 @@ public class Player extends JFrame{
    
    //Label of Walls for wallTracker
    ArrayList<JLabel> jlWallCount = new ArrayList<JLabel>();
-   
-   /**
-    * Main method calls the default constructor of this class, and displays the game
-    *
-    * @param args - argument string(s) to run during compilation 
-    */    
+ 
     public static void main(String [] args){
      
       try {
@@ -150,10 +124,7 @@ public class Player extends JFrame{
       catch (IllegalAccessException e) {
       // handle exception
       }
-      
-    /**
-    * Default constructor
-    */   
+   
      new Player();
      
    } //End of main
@@ -190,6 +161,23 @@ public class Player extends JFrame{
       
       //NEW STUFF FROM JACK
       clientName = JOptionPane.showInputDialog("Enter a player name: ");
+
+
+		String intro = "Welcome! \n\nThis is the intro guide on how to navigate"+
+		" our Quoridor game.\nAll of the options listed below can be accessed"+
+		" through the 'Settings'\ntab at the top left of the window.\n\n" +
+		"Connect to a Game - To connect to an online game, click on the\n"+
+		"'Connect...' menu item. A window will pop up asking for an ip address.\n"+
+		"If the server is located on your computer, just click the 'Connect'\n"+
+		"button. If not, type in the IP address of the computer that has the\n"+
+		"server on it.\n\n"+
+		"View the Rules of Quoridor - If you are not sure how to play Quoridor,\n"+
+		"simply click on the 'Game Rules' menu item.\n\n"+
+		"See Who Made this Program - If you would like to see who developed this\n"+
+		"program, click on the 'Credits' menu item.\n\n"+
+		"Exit the Game - To exit the game, click on the 'Exit' menu item.";
+
+		JOptionPane.showMessageDialog(null, intro);
       
 
 		addWindowListener(new WindowAdapter(){
@@ -237,7 +225,14 @@ public class Player extends JFrame{
 			});
 			jmiAbout.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent ae){
+					String ruleString = "Each player's pawn start in the center of the board. \n" +
+                      "The goal of the game is to reach the other side. \n" +
+							                       "A player may choose to either move their pawn or place a wall on their turn. \n" +
+														                        "Player pieces may move up, down, left, or right. Two pieces may not occupy the same spot. \n" +
+																						                      "Walls are placed horizontally or vertically and take up two connecting spots. \n" +
+																													                       "Walls can't be moved and can never completely wall in the opponent. There must always be a path. \n";
 
+					JOptionPane.showMessageDialog(null, ruleString);
 
 				}
 
@@ -245,6 +240,10 @@ public class Player extends JFrame{
 			jmiCredits.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent ae){
 
+					String credits = "The contributors to the Quoridor Program: \n\n"+
+					"- Catherine Poggioli\n- John Hill\n- Jack Old\n- David Luong";
+
+					JOptionPane.showMessageDialog(null, credits);
 
 				}
 
@@ -302,15 +301,22 @@ public class Player extends JFrame{
       	jpStartPane.add(jpNamePane, BorderLayout.NORTH);
       	jpStartPane.add(jpIpPane, BorderLayout.CENTER);
       
-      	jbConnect = new JButton("Start Client");
+      	jbConnect = new JButton("Connect");
       	jpStartPane.add(jbConnect, BorderLayout.SOUTH);
       	add(jpStartPane);
 
 			jbConnect.addActionListener(new ActionListener(){
 				public void actionPerformed(ActionEvent ae){
-					ip_address = jtfAddress.getText();
-					new SocketSetup();
-					dispose();
+					if(jtfAddress.getText().equals("")){
+						ip_address = "localhost";
+						new SocketSetup();
+						dispose();
+					}
+					else{
+						ip_address = jtfAddress.getText();
+						new SocketSetup();
+						dispose();
+					}
       			//new SocketSetup();
 
 				}
@@ -348,9 +354,7 @@ public class Player extends JFrame{
 		
 
   	}//end of PlayerDisconnect 
-   /**
-    * Inner Class for displaying chat messages 
-    */   
+   
    class ChatDisplay extends JPanel implements ActionListener, KeyListener{
    
       public ChatDisplay(){
@@ -453,9 +457,7 @@ public class Player extends JFrame{
       
       
    }//End of chat display class
-   /**
-    * Inner Class for updating scores on the score board.
-    */   
+   
    class Tracker extends JPanel{
    
       public Tracker(){
@@ -497,14 +499,9 @@ public class Player extends JFrame{
          //setPreferredSize(new Dimension(200, 300));
          //setBorder( new EmptyBorder( 10, 30, 15, 15 ) );
       }
-   } 
-   /**
-    * Inner Class for setting the dimensions of the game board
-    */   
+   }  
    class GridBag extends JPanel implements ActionListener{
-      /**
-       * GridBag default constructor
-       */       
+      
       GridBag(){
    
          Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -631,9 +628,7 @@ public class Player extends JFrame{
           
       
       }//End of constructor 
-      /**
-       * Event handlers
-       */      
+      
       public void	actionPerformed(ActionEvent ae){
          
          //Get location of button clicked
@@ -647,7 +642,7 @@ public class Player extends JFrame{
          
          //If middle wall clicked, need to decide if they want to place a horizontal or vertical wall
          if (name.equals("player")){
-            //System.out.println(x + " " + y);
+            System.out.println(x + " " + y);
         
             if(!((x == tLocation[clientNum][0]) && (y == tLocation[clientNum][1]))){
                enableDisableWall(false);
@@ -798,13 +793,9 @@ public class Player extends JFrame{
       
    } //End of class SocketSetup
    
-   /**
-    * Inner Class for running the threads
-    */   
+   
    class ThreadReader extends Thread implements ActionListener{
-      /**
-       * ThreadReader default constructor
-       */     
+   
       public ThreadReader(){
          
                 
@@ -834,6 +825,7 @@ public class Player extends JFrame{
                   InitialGame ig = (InitialGame)genObject;
                   pAmount = ig.getPlayerAmount();
                   pNames = ig.getArray();
+                  System.out.println(pNames.get(0) + " " + pNames.get(1));
                   
                   for(int i = 0; i < pAmount; i++){
                      playerArray[resetLocation[i][0]][resetLocation[i][1]] = 1;
@@ -1005,25 +997,25 @@ public class Player extends JFrame{
       playerSpace[x][y].setEnabled(clickable);
        
       try{
-         if(playerArray[x+1][y] == 0 && bottomArray[x][y] == 0){
+         if(playerArray[x+1][y] == 0){
             playerSpace[x+1][y].setEnabled(clickable);
          }  
       }
       catch(ArrayIndexOutOfBoundsException ae){}
       try{
-         if(playerArray[x-1][y] == 0 && bottomArray[x-1][y] == 0){
+         if(playerArray[x-1][y] == 0){
             playerSpace[x-1][y].setEnabled(clickable);
          }     
       }
       catch(ArrayIndexOutOfBoundsException ae){}   
       try{
-         if(playerArray[x][y+1] == 0 && rightArray[x][y] == 0){
+         if(playerArray[x][y+1] == 0){
             playerSpace[x][y+1].setEnabled(clickable);
          }            
       }
       catch(ArrayIndexOutOfBoundsException ae){}   
       try{
-         if(playerArray[x][y-1] == 0 && rightArray[x][y-1] == 0){
+         if(playerArray[x][y-1] == 0){
             playerSpace[x][y-1].setEnabled(clickable);
          }            
       }

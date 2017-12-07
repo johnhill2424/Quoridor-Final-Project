@@ -6,21 +6,7 @@ import java.util.*;
 import java.io.*;
 import java.lang.Object.*;
 import java.lang.StringBuilder;
-/**
- * Game Server accepts player connections, and enables player communication.
- *
- * @author Catherine Poggioli 
- * @author John Hill
- * @author Jack Old
- * @author David Luong
- *
- * @group# 06 
- * @course ISTE 121
- * @instructor Michael Floeser
- *
- * @version 2017-11-30
- */
- 
+
 //NEWEST VERSION
 public class Server extends JFrame{
 
@@ -44,19 +30,11 @@ public class Server extends JFrame{
 
    //Create vector of InnerClass for the players (clients)
    private Vector<PlayerThread> players = new Vector<PlayerThread>();
-
-   /**
-    * Main method calls the default constructor, which starts the Server
-    *
-    * @param args -  argument string(s) to run during compilation 
-    */   
+   
    public static void main(String [] args){
       new Server();
    } //End of main
    
-   /**
-    * Server default constructor
-    */   
    public Server(){
  	
 		JPanel jpPlayers = new JPanel(new GridLayout(0,1));
@@ -151,9 +129,6 @@ public class Server extends JFrame{
 
 	}
    
-   /**
-    * Inner Threaded Class for players
-    */   
    class PlayerThread extends Thread{
    
       private Socket cs = null;
@@ -197,7 +172,6 @@ public class Server extends JFrame{
                   name = pn.getPlayerName();
                   nameList.add(name); //adds the player to the playerName arraylist
                   index = nameList.size() -1;
-                  //
                   connectionList.add("C");
 						jtaDisplay.get(index).setText(jtaConnectToString(name, (""+cs)));
                   pn.setIndex(index);
@@ -205,17 +179,15 @@ public class Server extends JFrame{
                    
                   players.get(index).sendInfo(pn);
                   
-                  if(players.size() == 4){ // change to 4 for normal play
+                  if(players.size() == 2){ // change to 4 for normal play
                      startGame();
                   }
                   
                }//End of if
                else if (genObject instanceof WinCon){//Checks for win condition msg
                   WinCon wc = (WinCon)genObject;
-                  for(int i = 0; i < players.size(); i++){
-                     if(connectionList.get(i) == "C"){
-                        players.get(i).sendInfo(wc);
-                     }
+                  for(PlayerThread pt : players){
+                     pt.sendInfo(wc);
                   }
                }//end if
                else if (genObject instanceof ChatMessage){
@@ -229,6 +201,9 @@ public class Server extends JFrame{
                      StringBuilder nameMsg = new StringBuilder(brokenMsg[0]);
                      nameMsg.deleteCharAt(0);
                      msgRead = nameMsg.toString();
+                     System.out.println(brokenMsg[0]);
+                     System.out.println(brokenMsg[1]);
+                     System.out.println(msgRead);
                      if(nameList.indexOf(msgRead) != -1){
                         cm = new ChatMessage(brokenMsg[1]);
                         cm.setName(name);
@@ -238,19 +213,15 @@ public class Server extends JFrame{
                      else{
                         cm = new ChatMessage("Error. Not a player name. Please try again.");
                         cm.setName("Server");
-                        if(connectionList.get(nameList.indexOf(name)) == "C"){
-                           players.get(nameList.indexOf(name)).sendInfo(cm);
-                        }
+                        players.get(nameList.indexOf(name)).sendInfo(cm);
                      }
                   }
                   else{//if msg is for all players
 						   jtaChatLog.append(cm.toString());
-                     for(int i = 0; i < players.size(); i++){
-                        if(connectionList.get(i) == "C"){
-                           players.get(i).sendInfo(cm);
-                        }
-                     } 
-                  }
+                     for(PlayerThread pt: players){
+                        pt.sendInfo(cm);
+                     }
+                  }  
                }
                else if (genObject instanceof VertPlace){
                   VertPlace vp = (VertPlace)genObject;
@@ -259,11 +230,9 @@ public class Server extends JFrame{
                   jtaDisplay.get(vp.getIndex()).append("Placed a Vertical Wall");
                   //use the list to print results to proper person
                   
-                  for(int i = 0; i < players.size(); i++){
-                     if(connectionList.get(i) == "C"){
-                        players.get(i).sendInfo(vp);
-                     }
-                  }
+                  for(PlayerThread pt: players){
+                     pt.sendInfo(vp);
+                  }//send changes to each player
                   
                   //NEEDS TO GIVE TURN ORDER TO NEXT PLAYER HERE 
                   passTurn(vp.getIndex(), 0, vp.getIndex());
@@ -276,11 +245,9 @@ public class Server extends JFrame{
                   jtaDisplay.get(hp.getIndex()).append("Placed a Horizontal Wall");
                   //use the list to print results to proper person
                   
-                  for(int i = 0; i < players.size(); i++){
-                     if(connectionList.get(i) == "C"){
-                        players.get(i).sendInfo(hp);
-                     }
-                  }
+                  for(PlayerThread pt: players){
+                     pt.sendInfo(hp);
+                  }//send changes to each player
                   
                   passTurn(hp.getIndex(), 0, hp.getIndex());
                }
@@ -289,24 +256,36 @@ public class Server extends JFrame{
                   
                   jtaDisplay.get(place.getIndex()).append("Moved their Token");
                   
-                  for(int i = 0; i < players.size(); i++){
-                     if(connectionList.get(i) == "C"){
-                        players.get(i).sendInfo(place);
-                     }
+                  for(PlayerThread pt: players){
+                     pt.sendInfo(place);
                   }
                   passTurn(place.getIndex(), 0, place.getIndex());   
                }
                else if(genObject instanceof PlayerExit){
 						PlayerExit pl = (PlayerExit)genObject;
+						ChatMessage cm = new ChatMessage(String.format("***%s HAS DISCONNECTED***%n", name));
+						cm.setName("System Console");
 
 						System.out.println("Player Exited BOIII");
 						
+						for(int i=0; i<connectionList.size(); i++){
+							System.out.println(connectionList.get(i));
+						}
 
 						connectionList.set(index, "D");
 
+						for(int i=0;i<players.size(); i++){
+							players.get(i).sendInfo(cm);
+
+						}
+
+						for(int i=0; i<connectionList.size(); i++){
+							System.out.println(connectionList.get(i));
+						}
 
 						jtaDisplay.get(index).setText(jtaDisconnectToString(name, (""+cs)));
 
+                  
 
 						try{
 							oos.writeObject(pl);
@@ -341,7 +320,7 @@ public class Server extends JFrame{
          
          catch (SocketException se){
             System.out.println("A player has disconnected");
-            jtaChatLog.append("**A PLAYER HAS DISCONNECTED** \n");
+            jtaChatLog.append("**A PLAYER HAS DISCONNECTED**");
          }
          
          catch(NullPointerException npe){
@@ -402,11 +381,12 @@ public class Server extends JFrame{
                      
       //generate inital tokens command
          InitialGame ig = new InitialGame();
+         System.out.println(nameList.get(0) + " " + nameList.get(1));
          ig.setArray(nameList);
-         for(int i = 0; i < players.size(); i++){
-            if(connectionList.get(i) == "C"){
-               players.get(i).sendInfo(ig);
-            }
+         System.out.println("beep-boop");
+         for(PlayerThread pt: players){
+            System.out.println(ig.getPlayerAmount());
+            pt.sendInfo(ig);
          }
                      
          //Now give turn order to first player       
