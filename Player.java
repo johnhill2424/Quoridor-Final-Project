@@ -954,7 +954,7 @@ public class Player extends JFrame{
               
                //used to set up a new game with current total players
                else if (genObject instanceof InitialGame){
-                  jmiNewGame.setEnabled(true);
+                  //jmiNewGame.setEnabled(true);
                   InitialGame ig = (InitialGame)genObject;
                   pAmount = ig.getPlayerAmount();
                   pNames = ig.getArray();

@@ -44,6 +44,12 @@ public class Server extends JFrame{
    //Create vector of InnerClass for the players (clients)
    private Vector<PlayerThread> players = new Vector<PlayerThread>();
 
+
+	//JMenu Stuff
+	private JMenuBar jmb;
+	private JMenu jm;
+	private JMenuItem jmiReset;
+
    /**
     * Main method calls the default constructor, which starts the Server
     *
@@ -69,11 +75,23 @@ public class Server extends JFrame{
 		   //jtaP3.setText("TESTING");
 		}
 		jtaChatLog = new JTextArea(5,50);
+
+		//Initializing the JMenu
+		jmb = new JMenuBar();
+		jm = new JMenu("Options");
+		jmiReset = new JMenuItem("Reset Server");
+
+		jmb.add(jm);
+		jm.add(jmiReset);
+		
+		//Adding action listener for the reset button
+		jmiReset.addActionListener(new ServerReset());
 		
 		JScrollPane scroll = new JScrollPane(jtaChatLog);
 		
 		add(scroll, BorderLayout.WEST);
 		add(jpPlayers, BorderLayout.CENTER);
+		add(jmb, BorderLayout.NORTH);
 		
 		jtaChatLog.setEditable(false);
 		
@@ -158,6 +176,65 @@ public class Server extends JFrame{
 	public String jtaDisconnectToString(String name, String address){
 		String result = String.format("%s%n%s%nDisconnected%n", name, address);
 		return result;
+	}
+	/**
+	* ServerReset is an action listener that resets the Server when called.
+	*
+	*/
+	class ServerReset implements ActionListener{
+
+		/**
+		* This is the default constructor for ServerReset.
+		*/
+		public ServerReset(){
+
+		}
+
+		/**
+		* actionPerformed checks if all clients have been disconnected, and if so,
+		* clears out all of the memory stored of previously connected clients.
+		*
+		* @param ae The action event that is taken in. 
+		*
+		*/
+		public void actionPerformed(ActionEvent ae){
+
+			System.out.println("This is a test");
+
+			boolean isConnected = false;
+
+			//loops through connectionList to see if any clients are connected
+			for(int i=0; i<connectionList.size();i++){
+					
+					if(connectionList.get(i).equals("C")){
+						isConnected = true;
+
+					}
+
+			}
+			//If no clients are connected, it clears out the memory of previuosly
+			//connected clients
+			if(!isConnected){
+				for(int i=0; i<nameList.size();i++){
+					nameList.remove(i);
+					connectionList.remove(i);
+					players.remove(i);
+
+				}
+				for(int i=0; i<jtaDisplay.size();i++){
+					
+					jtaDisplay.get(i).setText("");
+
+				}
+
+				System.out.println(nameList);
+				System.out.println(connectionList);
+				System.out.println(players);
+				
+			}
+
+		}
+
 	}
    
    /**
